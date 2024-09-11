@@ -1,5 +1,5 @@
 // import { Buffer } from 'buffer';
-import { Audio } from 'expo-av';
+import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import { Button, StyleSheet, View } from 'react-native';
 
@@ -149,6 +149,15 @@ const StreamAudio = () => {
                                     }
                                 });
 
+                                await Audio.setAudioModeAsync({
+                                    allowsRecordingIOS: false,
+                                    interruptionModeIOS: InterruptionModeIOS.DuckOthers,
+                                    playsInSilentModeIOS: true,
+                                    staysActiveInBackground: false,
+                                    shouldDuckAndroid: true,
+                                    interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+                                });
+                                
                                 await sound.playAsync();
                             } catch (e) {
                                 console.error(e);
