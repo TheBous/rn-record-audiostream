@@ -3,7 +3,10 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { polyfill as polyfillFetch } from 'react-native-polyfill-globals/src/fetch';
 import 'react-native-reanimated';
+
+polyfillFetch();
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
