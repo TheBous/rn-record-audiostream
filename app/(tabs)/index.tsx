@@ -1,12 +1,12 @@
-import StreamAudio from '@/components/StreamAudio';
+import RecButton from '@/components/RecButton';
 import { StyleSheet, View } from 'react-native';
 
 export default function App() {
 
   return (
     <View style={styles.container}>
-      {/* <RecButton /> */}
-      <StreamAudio />
+      <RecButton />
+      {/* <StreamAudinRecButton /> */}
     </View>
   );
 }
