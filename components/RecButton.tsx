@@ -5,13 +5,15 @@ import MicSvg from './SVG/recording/Mic';
 
 const RecButton = ({
     startRecording = () => { },
-    stopRecording = () => { }
+    stopRecording = () => { },
+    disabled = false,
 }) => {
     return (
         <Pressable
             className={`w-40 h-40 rounded-full flex items-center justify-center bg-red-600`}
             onTouchStart={startRecording}
             onTouchEnd={stopRecording}
+            disabled={disabled}
         >
             <SvgWrapper svgComponent={MicSvg} containerStyle={{
                 width: '50%',

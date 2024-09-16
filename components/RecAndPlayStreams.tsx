@@ -3,6 +3,7 @@ import { RecordingStatus } from 'expo-av/build/Audio';
 import { useRef, useState } from 'react';
 import { Animated, View } from 'react-native';
 import RecButton from './RecButton';
+import SoundBars from './Voice/SoundBars';
 
 const domain = 'https://beta-ai-rag-system-backend.original.land';
 
@@ -224,10 +225,12 @@ export default function RecAndPlayStreams() {
           transform: [{ scale: scaleAnim }],
         }}
       >
-        <RecButton
+        {isPlaying && <SoundBars onVoiceClick={console.log} />}
+        {!isPlaying && <RecButton
+          disabled={isRecording || isPlaying}
           startRecording={startRecording}
           stopRecording={stopRecording}
-        />
+        />}
       </Animated.View>
     </View>
     // {!!audioUri && !isPlaying && <Button title="Play Sound" onPress={() => playSound('https://beta-ai-rag-system-backend.original.land/api/omni/consume_audio?streamName=37ab16b9-93fd-4e81-a833-b7929c21bf28')} />}
