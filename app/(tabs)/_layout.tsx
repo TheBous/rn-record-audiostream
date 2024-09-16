@@ -1,4 +1,5 @@
 import { Tabs } from 'expo-router';
+import { KeyRound } from "lucide-react-native";
 import React from 'react';
 
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
@@ -24,12 +25,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="settings"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
-          ),
+          title: 'settings',
+          tabBarIcon: ({ color }) => <KeyRound color={color} />
         }}
       />
     </Tabs>
