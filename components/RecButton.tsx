@@ -1,7 +1,9 @@
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { RecordingStatus } from 'expo-av/build/Audio';
 import { useState } from 'react';
-import { Pressable, SafeAreaView, StyleSheet, Text } from 'react-native';
+import { Pressable, SafeAreaView, StyleSheet } from 'react-native';
+import SvgWrapper from './SVG/SvgWrapper';
+import MicSvg from './SVG/recording/Mic';
 
 const domain = 'https://beta-ai-rag-system-backend.original.land';
 
@@ -186,7 +188,11 @@ export default function RecButton() {
         style={styles.btn}
         onPress={myRecording ? stopRecording : startRecording}
       >
-        <Text>{myRecording ? 'Stop Recording' : 'Start Recording'}</Text>
+        <SvgWrapper svgComponent={MicSvg} containerStyle={{
+          width: '50%',
+          height: '50%'
+        }} />
+
       </Pressable>
     </SafeAreaView>
     // {!!audioUri && !isPlaying && <Button title="Play Sound" onPress={() => playSound('https://beta-ai-rag-system-backend.original.land/api/omni/consume_audio?streamName=37ab16b9-93fd-4e81-a833-b7929c21bf28')} />}
@@ -202,10 +208,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   btn: {
-    backgroundColor: 'red',
+    backgroundColor: '#DC2626',
     width: 200,
     height: 200,
     borderRadius: 100,
-    textAlign: "center"
+    textAlign: "center",
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: "center"
+  },
+  btnText: {
+    textAlign: 'center'
   }
 });
