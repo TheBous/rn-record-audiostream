@@ -1,7 +1,7 @@
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { RecordingStatus } from 'expo-av/build/Audio';
-import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Animated, Pressable, View } from 'react-native';
 import SvgWrapper from './SVG/SvgWrapper';
 import MicSvg from './SVG/recording/Mic';
 
@@ -15,10 +15,46 @@ export default function RecButton() {
   const [durationMillis, setDurationMillis] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
 
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+  const animationRef = useRef<Animated.CompositeAnimation | null>(null);
+
   const onRecordingStatusUpdate = (status: RecordingStatus) => {
     const { isRecording: _isRecording = false, durationMillis: _durationMillis = 0 } = status;
     setIsRecording(_isRecording);
     setDurationMillis(_durationMillis);
+  };
+
+  const startAnimation = () => {
+    console.warn('Animation started');
+    animationRef.current = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 0.9,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    animationRef.current.start();
+  };
+
+  const stopAnimation = () => {
+    console.warn("STOP animation");
+    if (animationRef.current) {
+      animationRef.current.stop(); // Ferma l'animazione
+      animationRef.current = null;
+      // Reimposta il valore dell'animazione se necessario
+      Animated.timing(scaleAnim, {
+        toValue: 0.9,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
   };
 
   const startRecording = async () => {
@@ -27,6 +63,8 @@ export default function RecButton() {
         console.log('Requesting permission..');
         await requestPermission();
       }
+
+      startAnimation();
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
@@ -143,6 +181,7 @@ export default function RecButton() {
 
   const stopRecording = async () => {
     try {
+      stopAnimation();
       console.log('Stopping myRecording..');
       setMyRecording(undefined);
       setIsRecording(false);
@@ -184,33 +223,24 @@ export default function RecButton() {
 
   return (
     <View className="flex items-center justify-center">
-      <Pressable
-        className="bg-red-600 w-40 h-40 rounded-full flex items-center justify-center"
-        onPress={myRecording ? stopRecording : startRecording}
+      <Animated.View
+        style={{
+          transform: [{ scale: scaleAnim }],
+        }}
       >
-        <SvgWrapper svgComponent={MicSvg} containerStyle={{
-          width: '50%',
-          height: '50%'
-        }} />
-
-      </Pressable>
+        <Pressable
+          className={`w-40 h-40 rounded-full flex items-center justify-center bg-red-600`}
+          onPress={myRecording ? stopRecording : startRecording}
+          onTouchStart={startRecording}
+          onTouchEnd={stopRecording}
+        >
+          <SvgWrapper svgComponent={MicSvg} containerStyle={{
+            width: '50%',
+            height: '50%'
+          }} />
+        </Pressable>
+      </Animated.View>
     </View>
     // {!!audioUri && !isPlaying && <Button title="Play Sound" onPress={() => playSound('https://beta-ai-rag-system-backend.original.land/api/omni/consume_audio?streamName=37ab16b9-93fd-4e81-a833-b7929c21bf28')} />}
   );
 }
-
-const styles = StyleSheet.create({
-  btn: {
-    backgroundColor: '#DC2626',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    textAlign: "center",
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: "center"
-  },
-  btnText: {
-    textAlign: 'center'
-  }
-});
