@@ -1,12 +1,14 @@
 import { Pressable } from 'react-native';
-import SvgWrapper from './SVG/SvgWrapper';
-import MicSvg from './SVG/recording/Mic';
+import SvgWrapper from '../SVG/SvgWrapper';
+import MicSvg from '../SVG/recording/Mic';
+import BouncingLoader from './BouncingLoader';
 
 
 const RecButton = ({
     startRecording = () => { },
     stopRecording = () => { },
     disabled = false,
+    isLoading = false,
 }) => {
     return (
         <Pressable
@@ -15,11 +17,13 @@ const RecButton = ({
             onTouchEnd={stopRecording}
             disabled={disabled}
         >
-            <SvgWrapper svgComponent={MicSvg} containerStyle={{
-                width: '50%',
-                height: '50%'
-            }}
-            />
+            {isLoading ?
+                <BouncingLoader /> :
+                <SvgWrapper svgComponent={MicSvg} containerStyle={{
+                    width: '50%',
+                    height: '50%'
+                }} />
+            }
         </Pressable>
     );
 };

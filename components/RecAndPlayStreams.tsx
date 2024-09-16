@@ -1,9 +1,9 @@
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { RecordingStatus } from 'expo-av/build/Audio';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Animated, View } from 'react-native';
-import RecButton from './RecButton';
-import SoundBars from './Voice/SoundBars';
+import RecButton from './RecButton/RecButton';
+import SoundBars from './RecButton/SoundBars';
 
 const domain = 'https://beta-ai-rag-system-backend.original.land';
 
@@ -14,6 +14,7 @@ export default function RecAndPlayStreams() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [durationMillis, setDurationMillis] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
+  const [isServerLoading, setServerLoading] = useState(false);
 
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
@@ -23,6 +24,7 @@ export default function RecAndPlayStreams() {
     setIsRecording(_isRecording);
     setDurationMillis(_durationMillis);
   };
+  const soundRef = useRef<Audio.Sound | null>(null);
 
   const startAnimation = () => {
     animationRef.current = Animated.loop(
@@ -90,90 +92,98 @@ export default function RecAndPlayStreams() {
 
 
   const sendToServer = async (uri: string) => {
-    const userApiKey = 'usr_rK1WGJWkuf9lzc33OW1pwf2WvqXBHQfL';
-    const botId = '669e08bd6614ff72acff93be';
+    try {
+      setServerLoading(true);
 
-    const formData = new FormData();
-    if (!uri) return '';
+      const userApiKey = 'usr_rK1WGJWkuf9lzc33OW1pwf2WvqXBHQfL';
+      const botId = '669e08bd6614ff72acff93be';
 
-    const audioFile: any = {
-      uri,
-      name: `test.mpeg`,
-      type: `audio/mpeg`,
-    };
+      const formData = new FormData();
+      if (!uri) return '';
 
-    formData.append('audio', audioFile);
-    formData.append('botId', botId);
-    formData.append('chat', JSON.stringify([]));
+      const audioFile: any = {
+        uri,
+        name: `test.mpeg`,
+        type: `audio/mpeg`,
+      };
 
-    const url = `${domain}/api/omni/${botId}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'X-Api-Key': userApiKey,
-        'Origin': 'noku-ai',
-        // 'X-Conversation-Id': conversationId || '',
-      },
-      body: formData,
-      // signal,
-    });
+      formData.append('audio', audioFile);
+      formData.append('botId', botId);
+      formData.append('chat', JSON.stringify([]));
 
-    if (response.ok) {
-      if (response.body) {
-        // const conversationId = response.headers.get('X-Conversation-Id');
-        // if (conversationId) saveConversationidToLocalStorage(conversationId, botId);
+      const url = `${domain}/api/omni/${botId}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-Api-Key': userApiKey,
+          'Origin': 'noku-ai',
+          // 'X-Conversation-Id': conversationId || '',
+        },
+        body: formData,
+        // signal,
+      });
 
-        const { data: responseData } = await response.json();
-        const { textStreamName, question, audioStreamName } = responseData;
+      if (response.ok) {
+        if (response.body) {
+          // const conversationId = response.headers.get('X-Conversation-Id');
+          // if (conversationId) saveConversationidToLocalStorage(conversationId, botId);
 
-        // TODO add question to chat and consume text streaming
+          const { data: responseData } = await response.json();
+          const { textStreamName, question, audioStreamName } = responseData;
 
-        if (audioStreamName) {
-          const streamingAudioUrl = `${domain}/api/omni/consume_audio?streamName=${audioStreamName}`;
-          await playSound(streamingAudioUrl);
-          // audio.src = streamingAudioUrl;
-          // audio.crossOrigin = 'anonymous';
-          // audio.play()
+          // TODO add question to chat and consume text streaming
 
-          // audio.onloadedmetadata = () => {
-          //   ChatMetadataStore.update((store) => ({ ...store, aiIsTalking: true }));
-          // }
+          if (audioStreamName) {
+            const streamingAudioUrl = `${domain}/api/omni/consume_audio?streamName=${audioStreamName}`;
+            await playSound(streamingAudioUrl);
+            // audio.src = streamingAudioUrl;
+            // audio.crossOrigin = 'anonymous';
+            // audio.play()
 
-          // audio.onended = () => {
+            // audio.onloadedmetadata = () => {
+            //   ChatMetadataStore.update((store) => ({ ...store, aiIsTalking: true }));
+            // }
 
-          //   ChatMetadataStore.update((store) => ({ ...store, aiIsTalking: false }));
-          // }
+            // audio.onended = () => {
 
-          // audio.onerror = () => {
-          //   ChatMetadataStore.update((store) => ({ ...store, aiIsTalking: false }));
+            //   ChatMetadataStore.update((store) => ({ ...store, aiIsTalking: false }));
+            // }
+
+            // audio.onerror = () => {
+            //   ChatMetadataStore.update((store) => ({ ...store, aiIsTalking: false }));
+            // }
+          }
+
+          // if (textStreamName) {
+          //   const response = await fetch(
+          //     `${PUBLIC_BOT_ENDPOINT}/api/omni/consume_text?streamName=${textStreamName}`,
+          //     { method: 'GET' }
+          //   );
+
+          //   if (response.ok) {
+          //     const reader = response.body!.getReader();
+          //     let isNewMessage = true;
+          //     while (true) {
+          //       const { done, value } = await reader.read();
+          //       if (done) break;
+
+          //       const decodedValue = new TextDecoder().decode(value, { stream: true });
+          //       if (updateChatClientHistory) {
+          //         updateChatClientHistory(decodedValue, {
+          //           forceNewMessage: isNewMessage,
+          //           role: 'answer'
+          //         })
+          //       }
+          //       isNewMessage = false;
+          //     }
+          //   }
           // }
         }
-
-        // if (textStreamName) {
-        //   const response = await fetch(
-        //     `${PUBLIC_BOT_ENDPOINT}/api/omni/consume_text?streamName=${textStreamName}`,
-        //     { method: 'GET' }
-        //   );
-
-        //   if (response.ok) {
-        //     const reader = response.body!.getReader();
-        //     let isNewMessage = true;
-        //     while (true) {
-        //       const { done, value } = await reader.read();
-        //       if (done) break;
-
-        //       const decodedValue = new TextDecoder().decode(value, { stream: true });
-        //       if (updateChatClientHistory) {
-        //         updateChatClientHistory(decodedValue, {
-        //           forceNewMessage: isNewMessage,
-        //           role: 'answer'
-        //         })
-        //       }
-        //       isNewMessage = false;
-        //     }
-        //   }
-        // }
       }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setServerLoading(false);
     }
   };
 
@@ -208,15 +218,25 @@ export default function RecAndPlayStreams() {
   const playSound = async (overrideUri?: string) => {
     try {
       const uri = overrideUri || audioUri;
-      console.warn(1, uri);
       if (!uri) throw new Error('No audio URI to play');
       const { sound } = await Audio.Sound.createAsync({ uri }, { shouldPlay: false }, onPlayingStatusUpdate);
 
-      await sound.playAsync();
+      soundRef.current = sound;
+      await soundRef.current.playAsync();
     } catch (e) {
       console.error('Failed to play sound', e);
     }
   };
+
+  const onStopPlaying = () => {
+    soundRef.current?.stopAsync();
+    soundRef.current?.unloadAsync();
+
+    soundRef.current = null;
+    setIsPlaying(false);
+  };
+
+  const isRecButtonDisabled = useMemo(() => isRecording || isPlaying || isServerLoading, [isRecording, isPlaying, isServerLoading])
 
   return (
     <View className="flex items-center justify-center">
@@ -225,12 +245,15 @@ export default function RecAndPlayStreams() {
           transform: [{ scale: scaleAnim }],
         }}
       >
-        {isPlaying && <SoundBars onVoiceClick={console.log} />}
-        {!isPlaying && <RecButton
-          disabled={isRecording || isPlaying}
-          startRecording={startRecording}
-          stopRecording={stopRecording}
-        />}
+        {isPlaying ?
+          <SoundBars onVoiceClick={onStopPlaying} /> :
+          <RecButton
+            isLoading={isServerLoading}
+            disabled={isRecButtonDisabled}
+            startRecording={startRecording}
+            stopRecording={stopRecording}
+          />
+        }
       </Animated.View>
     </View>
     // {!!audioUri && !isPlaying && <Button title="Play Sound" onPress={() => playSound('https://beta-ai-rag-system-backend.original.land/api/omni/consume_audio?streamName=37ab16b9-93fd-4e81-a833-b7929c21bf28')} />}
