@@ -1,7 +1,7 @@
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { RecordingStatus } from 'expo-av/build/Audio';
 import { useState } from 'react';
-import { Button, StyleSheet, View } from 'react-native';
+import { Pressable, SafeAreaView, StyleSheet, Text } from 'react-native';
 
 const domain = 'https://beta-ai-rag-system-backend.original.land';
 
@@ -181,27 +181,31 @@ export default function RecButton() {
   };
 
   return (
-    <View style={styles.container}>
-      <Button
-        title={myRecording ? 'Stop Recording' : 'Start Recording'}
+    <SafeAreaView style={styles.container}>
+      <Pressable
+        style={styles.btn}
         onPress={myRecording ? stopRecording : startRecording}
-      />
-      {!!audioUri && !isPlaying && <Button title="Play Sound" onPress={() => playSound('https://beta-ai-rag-system-backend.original.land/api/omni/consume_audio?streamName=37ab16b9-93fd-4e81-a833-b7929c21bf28')} />}
-    </View>
+      >
+        <Text>{myRecording ? 'Stop Recording' : 'Start Recording'}</Text>
+      </Pressable>
+    </SafeAreaView>
+    // {!!audioUri && !isPlaying && <Button title="Play Sound" onPress={() => playSound('https://beta-ai-rag-system-backend.original.land/api/omni/consume_audio?streamName=37ab16b9-93fd-4e81-a833-b7929c21bf28')} />}
   );
 }
 
-// Test streaming:
-
-// https://audio-edge-cmc51.fra.h.radiomast.io/ref-128k-mp3-stereo
-// https://cdn.radiantmediatechs.com/rmp/media/samples-for-rmp-site/04052024-lac-de-bimont/hls/playlist.m3u8
-
-
 const styles = StyleSheet.create({
   container: {
+    padding: 10,
+    display: 'flex',
+    alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#ecf0f1',
-    padding: 10,
   },
+  btn: {
+    backgroundColor: 'red',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    textAlign: "center"
+  }
 });

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mic-audiostream",
-    "slug": "mic-audiostream",
+    "name": "superhumans-app",
+    "slug": "superhumans-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
