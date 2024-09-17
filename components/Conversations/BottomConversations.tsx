@@ -49,7 +49,7 @@ const BottomConversations = ({ sendNewMsg }: IBottomConversationsProps) => {
                             const msgColour = role === MessageRole.AI ? "bg-blue-400" : 'bg-gray-400';
 
                             return (
-                                <View className={`flex ${imagePositioning} gap-x-2 items-center ${positioningClass} max-w-[85%]`} key={`${content}-${index}`}>
+                                <View className={`flex ${imagePositioning} gap-x-2 items-start ${positioningClass} max-w-[85%]`} key={`${content}-${index}`}>
                                     <Image
                                         className='rounded-full w-10 h-10'
                                         source={{
@@ -63,7 +63,7 @@ const BottomConversations = ({ sendNewMsg }: IBottomConversationsProps) => {
                             )
                         })}
                     </ScrollView>
-                    <View className='w-full flex gap-x-2 items-center justify-between flex-row' style={{ marginBottom: 5 }}>
+                    <View className='w-full flex gap-x-2 items-center justify-between flex-row' style={{ marginBottom: 20 }}>
                         <TextInput
                             className='flex-1 h-12 border border-blue-500 rounded-md text-black px-2'
                             value={text}

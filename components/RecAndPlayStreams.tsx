@@ -1,4 +1,4 @@
-import useMessagesStore, { MessageRole } from '@/store/messages';
+import useMessagesStore, { ChatMessage, MessageRole } from '@/store/messages';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { RecordingStatus } from 'expo-av/build/Audio';
 import { useMemo, useRef, useState } from 'react';
@@ -10,6 +10,8 @@ import Voice from './RecButton/Voice';
 
 const domain = 'https://beta-ai-rag-system-backend.original.land';
 
+const userApiKey = 'usr_rK1WGJWkuf9lzc33OW1pwf2WvqXBHQfL';
+const botId = '669e08bd6614ff72acff93be';
 let myRecording: Audio.Recording | undefined;
 
 export default function RecAndPlayStreams() {
@@ -93,10 +95,8 @@ export default function RecAndPlayStreams() {
         }
       });
 
-      // Imposta l'aggiornamento dello stato di registrazione
       myRecording.setOnRecordingStatusUpdate(onRecordingStatusUpdate);
 
-      // Avvia la registrazione
       await myRecording.startAsync();
 
       console.log('Recording started');
@@ -110,9 +110,6 @@ export default function RecAndPlayStreams() {
   const sendToServer = async (uri: string) => {
     try {
       setServerLoading(true);
-
-      const userApiKey = 'usr_rK1WGJWkuf9lzc33OW1pwf2WvqXBHQfL';
-      const botId = '669e08bd6614ff72acff93be';
 
       const formData = new FormData();
       if (!uri) return '';
@@ -268,6 +265,81 @@ export default function RecAndPlayStreams() {
     setIsPlaying(false);
   };
 
+
+  const sendNewMsg = async (question: string) => {
+    const formattedText = question.charAt(0).toUpperCase() + question.slice(1).toLowerCase();
+    appendmessage({ content: formattedText, role: MessageRole.USER });
+
+    const body: {
+      query: string;
+      streaming: boolean;
+      chat: ChatMessage[];
+      chatBotType: string;
+      conversationId?: string | null;
+    } = {
+      query: formattedText,
+      streaming: true,
+      chat: messages,
+      chatBotType: "playground"
+    };
+    let headers: HeadersInit = {
+      Accept: '*/*',
+      'X-Api-Key': userApiKey,
+    }
+
+    // if (shouldSaveOrLoadConversation(chatBotType, keepHistory) && conversationId) {
+    //   headers = { ...headers, 'X-Conversation-Id': conversationId };
+    // }
+
+    const formData = new FormData();
+    formData.append('inputData', JSON.stringify(body));
+
+    const response = await fetchRNApi(
+      `${domain}/api/chat/query/${botId}`,
+      {
+        method: 'POST',
+        headers,
+        body: formData,
+        reactNative: { textStreaming: true }
+        // signal
+      }
+    );
+
+    const bodyResponse = await response.body;
+    const reader = bodyResponse!.getReader();
+    let isNewMessage = true;
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) break;
+
+      const decodedValue = new TextDecoder().decode(value, { stream: true });
+
+      const messagesChunks = decodedValue.split('\n');
+
+      messagesChunks.forEach((contentChunk) => {
+        if (contentChunk) {
+          const parsedChunk = JSON.parse(contentChunk);
+          const content = parsedChunk.content;
+          console.warn(2, content);
+          if (content) {
+            if (isNewMessage) appendmessage({ content, role: MessageRole.AI });
+            else appendContentToLastMessage(content);
+
+            isNewMessage = false;
+          }
+        }
+      });
+      // if (decodedValue) {
+      //   if (isNewMessage) appendmessage({ content: decodedValue, role: MessageRole.AI });
+      //   else appendContentToLastMessage(` ${decodedValue}`);
+
+      //   isNewMessage = false;
+      // }
+    }
+
+  };
+
   return (
     <View className="flex items-center justify-center flex-1">
       <Animated.View
@@ -285,7 +357,7 @@ export default function RecAndPlayStreams() {
           />
         }
       </Animated.View>
-      <BottomConversations sendNewMsg={console.warn} />
+      <BottomConversations sendNewMsg={sendNewMsg} />
     </View>
   );
 }
