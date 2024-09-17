@@ -346,8 +346,8 @@ export default function RecAndPlayStreams() {
 
   return (
     <>
-    <Text className='ml-auto mr-auto mt-10 text-3xl font-bold text-center'>Talk to Noku AI</Text>
-    <Text className='ml-auto mr-auto mt-5 font-light text-lg text-center'>Press and hold red button to talk</Text>
+    <Text className='ml-auto mr-auto mt-10 text-4xl font-bold text-center'>Talk to Noku AI</Text>
+    <Text className='ml-auto mr-auto mt-5 font-light text-xl text-center'>Press and hold red button to talk</Text>
       <View className="flex items-center justify-center flex-1">
         <Animated.View
           style={{
