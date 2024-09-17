@@ -27,6 +27,9 @@ export default function RecAndPlayStreams() {
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
 
+  // Aggiungiamo l'AbortController
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   const onRecordingStatusUpdate = (status: RecordingStatus) => {
     const { isRecording: _isRecording = false, durationMillis: _durationMillis = 0 } = status;
     setIsRecording(_isRecording);
@@ -110,6 +113,8 @@ export default function RecAndPlayStreams() {
   const sendToServer = async (uri: string) => {
     try {
       setServerLoading(true);
+      // Creiamo un nuovo AbortController
+      abortControllerRef.current = new AbortController();
 
       const formData = new FormData();
       if (!uri) return '';
@@ -130,17 +135,14 @@ export default function RecAndPlayStreams() {
         headers: {
           'X-Api-Key': userApiKey,
           'Origin': 'noku-ai',
-          // 'X-Conversation-Id': conversationId || '',
         },
         body: formData,
-        // signal,
+        // Passiamo il segnale all'API fetch
+        signal: abortControllerRef.current.signal,
       });
 
       if (response.ok) {
         if (response.body) {
-          // const conversationId = response.headers.get('X-Conversation-Id');
-          // if (conversationId) saveConversationidToLocalStorage(conversationId, botId);
-
           const { data: responseData } = await response.json();
           const { textStreamName, question, audioStreamName } = responseData;
 
@@ -155,7 +157,11 @@ export default function RecAndPlayStreams() {
           if (textStreamName) {
             const response = await fetchRNApi(
               `${domain}/api/omni/consume_text?streamName=${textStreamName}`,
-              { method: 'GET', reactNative: { textStreaming: true } }
+              {
+                method: 'GET',
+                reactNative: { textStreaming: true },
+                signal: abortControllerRef.current.signal, // Passiamo il segnale
+              }
             );
 
             const body = await response.body;
@@ -170,8 +176,12 @@ export default function RecAndPlayStreams() {
           }
         }
       }
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      if (e.name === 'AbortError') {
+        console.log('Fetch aborted');
+      } else {
+        console.error(e);
+      }
     } finally {
       setServerLoading(false);
     }
@@ -192,9 +202,9 @@ export default function RecAndPlayStreams() {
     } catch (e) {
       console.error('Failed to stop recording', e);
     } finally {
-      // Assicurati di impostare myRecording su undefined
       myRecording = undefined;
       setIsRecording(false);
+      setServerLoading(false);
       setDurationMillis(0);
     }
   };
@@ -252,8 +262,15 @@ export default function RecAndPlayStreams() {
     soundRef.current?.stopAsync();
     soundRef.current?.unloadAsync();
 
-    soundRef.current = null;
+    // Abortiamo le chiamate fetch in corso
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+
+    // Resettiamo gli stati di caricamento
     setIsPlaying(false);
+    setServerLoading(false);
   };
 
 
@@ -279,43 +296,52 @@ export default function RecAndPlayStreams() {
       'X-Api-Key': userApiKey,
     }
 
-    // if (shouldSaveOrLoadConversation(chatBotType, keepHistory) && conversationId) {
-    //   headers = { ...headers, 'X-Conversation-Id': conversationId };
-    // }
-
     const formData = new FormData();
     formData.append('inputData', JSON.stringify(body));
 
-    const response = await fetchRNApi(
-      `${domain}/api/chat/query/${botId}`,
-      {
-        method: 'POST',
-        headers,
-        body: formData,
-        reactNative: { textStreaming: true }
-        // signal
-      }
-    );
+    try {
+      setServerLoading(true);
+      // Creiamo un nuovo AbortController
+      abortControllerRef.current = new AbortController();
 
-    const bodyResponse = await response.body;
-    const reader = bodyResponse!.getReader();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      const decodedValue = new TextDecoder().decode(value, { stream: true });
-
-      const messagesChunks = decodedValue.split('\n');
-
-      messagesChunks.forEach((contentChunk) => {
-        if (contentChunk) {
-          const parsedChunk = JSON.parse(contentChunk);
-          const content = parsedChunk.content;
-          if (content) appendContentToLastMessage(content);
+      const response = await fetchRNApi(
+        `${domain}/api/chat/query/${botId}`,
+        {
+          method: 'POST',
+          headers,
+          body: formData,
+          reactNative: { textStreaming: true },
+          signal: abortControllerRef.current.signal // Passiamo il segnale
         }
-      });
-    }
+      );
 
+      const bodyResponse = await response.body;
+      const reader = bodyResponse!.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const decodedValue = new TextDecoder().decode(value, { stream: true });
+
+        const messagesChunks = decodedValue.split('\n');
+
+        messagesChunks.forEach((contentChunk) => {
+          if (contentChunk) {
+            const parsedChunk = JSON.parse(contentChunk);
+            const content = parsedChunk.content;
+            if (content) appendContentToLastMessage(content);
+          }
+        });
+      }
+    } catch (e: any) {
+      if (e.name === 'AbortError') {
+        console.log('Fetch aborted');
+      } else {
+        console.error(e);
+      }
+    } finally {
+      setServerLoading(false);
+    }
   };
 
   return (
