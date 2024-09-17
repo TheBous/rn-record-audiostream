@@ -2,7 +2,7 @@ import useMessagesStore, { ChatMessage, MessageRole } from '@/store/messages';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { RecordingStatus } from 'expo-av/build/Audio';
 import { useMemo, useRef, useState } from 'react';
-import { Animated, View } from 'react-native';
+import { Animated, Image, Text, View } from 'react-native';
 import { fetch as fetchRNApi } from "react-native-fetch-api";
 import BottomConversations from './Conversations/BottomConversations';
 import RecButton from './RecButton/RecButton';
@@ -345,23 +345,36 @@ export default function RecAndPlayStreams() {
   };
 
   return (
-    <View className="flex items-center justify-center flex-1">
-      <Animated.View
-        style={{
-          transform: [{ scale: scaleAnim }],
-        }}
-      >
-        {isPlaying ?
-          <Voice onVoiceClick={onStopPlaying} /> :
-          <RecButton
-            isLoading={isServerLoading}
-            disabled={isRecButtonDisabled}
-            startRecording={startRecording}
-            stopRecording={stopRecording}
-          />
-        }
-      </Animated.View>
-      <BottomConversations sendNewMsg={sendNewMsg} isSendNewMsgDisabled={isRecButtonDisabled} />
-    </View>
+    <>
+    <Text className='ml-auto mr-auto mt-10 text-3xl font-bold text-center'>Talk to Noku AI</Text>
+    <Text className='ml-auto mr-auto mt-5 font-light text-lg text-center'>Press and hold red button to talk</Text>
+      <View className="flex items-center justify-center flex-1">
+        <Animated.View
+          style={{
+            transform: [{ scale: scaleAnim }],
+          }}
+        >
+          {isPlaying ?
+            <Voice onVoiceClick={onStopPlaying} /> :
+            <View className='flex flex-col gap-y-5 items-center justify-between'>
+              <Image
+                source={{
+                  uri: 'https://static.noku.io/assets/noku/ai/bot-avatar/66d1764c1357bc6c2f64b256.png',
+                }}
+                className="w-56 h-56 rounded-full object-cover mr-2 mb-14"
+                alt="Agent avatar"
+              />
+              <RecButton
+                isLoading={isServerLoading}
+                disabled={isRecButtonDisabled}
+                startRecording={startRecording}
+                stopRecording={stopRecording}
+              />
+            </View>
+          }
+        </Animated.View>
+        <BottomConversations sendNewMsg={sendNewMsg} isSendNewMsgDisabled={isRecButtonDisabled} />
+      </View>
+    </>
   );
 }
