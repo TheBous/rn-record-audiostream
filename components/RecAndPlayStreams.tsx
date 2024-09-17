@@ -11,7 +11,7 @@ import Voice from './RecButton/Voice';
 const domain = 'https://beta-ai-rag-system-backend.original.land';
 
 const userApiKey = 'usr_rK1WGJWkuf9lzc33OW1pwf2WvqXBHQfL';
-const botId = '6666ae3ef38d11470be2949f';
+const botId = "66e9ae8dbf41992862cb0a29"; // strong beta: 66e9ae8dbf41992862cb0a29, noku ai beta: '6666ae3ef38d11470be2949f' - strong prod: 66b6266e76a3c6f8b549945a
 let myRecording: Audio.Recording | undefined;
 
 export default function RecAndPlayStreams() {
@@ -344,15 +344,17 @@ export default function RecAndPlayStreams() {
     }
   };
 
+  const imageUrl = "https://static.noku.io/assets/noku/ai/bot-avatar/66e9aed2bf41992862cb0a64.png"; // strong, noku ai: https://static.noku.io/assets/noku/ai/bot-avatar/66d1764c1357bc6c2f64b256.pngr
+
   return (
     <>
-      <Text className='ml-auto mr-auto mt-10 text-4xl font-bold text-center'>Talk to Noku AI</Text>
+      <Text className='ml-auto mr-auto mt-10 text-4xl font-bold text-center'>Talk to Strong Beta</Text>
       <Text className='ml-auto mr-auto mt-5 font-light text-xl text-center'>Press and hold red button to talk</Text>
       <View className="flex items-center justify-center flex-1">
         <View className='flex flex-col items-center justify-between'>
           <Image
             source={{
-              uri: 'https://static.noku.io/assets/noku/ai/bot-avatar/66d1764c1357bc6c2f64b256.png',
+              uri: imageUrl,
             }}
             className="w-56 h-56 rounded-full object-cover mr-2 mb-14"
             alt="Agent avatar"

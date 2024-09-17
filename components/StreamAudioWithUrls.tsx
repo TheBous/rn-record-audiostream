@@ -3,7 +3,7 @@ import { Button, StyleSheet, View } from "react-native";
 const StreamAudioWithUrls = () => {
     const playAudioFromNodeJS = async () => {
         const userApiKey = 'usr_rK1WGJWkuf9lzc33OW1pwf2WvqXBHQfL';
-        const botId = '6666ae3ef38d11470be2949f';
+        const botId = "66e9ae8dbf41992862cb0a29"; // strong beta: 66e9ae8dbf41992862cb0a29, noku ai beta: '6666ae3ef38d11470be2949f' - strong prod: 66b6266e76a3c6f8b549945a
 
         const formData = new FormData();
         const file = new File([questionBlob], 'test.mp3', { type: 'audio/mp3' });
