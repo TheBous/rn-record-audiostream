@@ -2,8 +2,9 @@ import useMessagesStore, { MessageRole } from '@/store/messages';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Send } from "lucide-react-native";
 import { useCallback, useRef } from 'react';
-import { Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import useMarkdown, { textToMarkdown } from 'react-native-usemarkdown-chat';
+import { Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
+import Markdown from 'react-native-markdown-display';
+import useMarkdown from 'react-native-usemarkdown-chat';
 import BouncingLoader from '../RecButton/BouncingLoader';
 
 interface IBottomConversationsProps {
@@ -61,7 +62,7 @@ const BottomConversations = ({ sendNewMsg, isSendNewMsgDisabled = false }: IBott
                                         }}
                                     />
                                     <View className={`border-gray-200 rounded-lg p-4 space-y-3 flex items-center gap-x-1 flex-wrap ${msgColour}`}>
-                                        {isLoadingMsg ? <BouncingLoader /> : <Text>{textToMarkdown(content)}</Text>}
+                                        {isLoadingMsg ? <BouncingLoader /> : <Markdown>{content}</Markdown>}
 
                                     </View>
                                 </View>
