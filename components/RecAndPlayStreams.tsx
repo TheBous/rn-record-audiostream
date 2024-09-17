@@ -10,15 +10,16 @@ import SoundBars from './RecButton/SoundBars';
 
 const domain = 'https://beta-ai-rag-system-backend.original.land';
 
+let myRecording: Audio.Recording | undefined;
+
 export default function RecAndPlayStreams() {
-  const [myRecording, setMyRecording] = useState<Audio.Recording>();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [audioUri, setAudioUri] = useState<string>();
   const [isPlaying, setIsPlaying] = useState(false);
   const [durationMillis, setDurationMillis] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isServerLoading, setServerLoading] = useState(false);
-  const { messages, setMessages, appendContentToLastMessage, appendmessage } = useMessagesStore();
+  const { messages, appendContentToLastMessage, appendmessage } = useMessagesStore();
 
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
@@ -63,6 +64,7 @@ export default function RecAndPlayStreams() {
 
   const startRecording = async () => {
     try {
+      if (isRecButtonDisabled) return;
       if (!permissionResponse || permissionResponse.status !== 'granted') {
         console.log('Requesting permission..');
         await requestPermission();
@@ -74,7 +76,11 @@ export default function RecAndPlayStreams() {
         playsInSilentModeIOS: true,
       });
 
-      const { recording } = await Audio.Recording.createAsync({
+      // Crea una nuova istanza di Audio.Recording
+      myRecording = new Audio.Recording();
+
+      // Prepara per la registrazione
+      await myRecording.prepareToRecordAsync({
         ...Audio.RecordingOptionsPresets.HIGH_QUALITY,
         ios: {
           ...Audio.RecordingOptionsPresets.HIGH_QUALITY.ios,
@@ -84,16 +90,21 @@ export default function RecAndPlayStreams() {
           ...Audio.RecordingOptionsPresets.HIGH_QUALITY.android,
           extension: '.mp4'
         }
-      }, onRecordingStatusUpdate);
+      });
 
-      if (!recording) throw new Error('Failed to create myRecording');
-      setMyRecording(recording);
+      // Imposta l'aggiornamento dello stato di registrazione
+      myRecording.setOnRecordingStatusUpdate(onRecordingStatusUpdate);
+
+      // Avvia la registrazione
+      await myRecording.startAsync();
+
       console.log('Recording started');
     } catch (err) {
-      console.error('Failed to start myRecording', err);
+      console.error('Failed to start recording', err);
     }
-  }
+  };
 
+  const isRecButtonDisabled = useMemo(() => isRecording || isPlaying || isServerLoading, [isRecording, isPlaying, isServerLoading])
 
   const sendToServer = async (uri: string) => {
     try {
@@ -180,25 +191,24 @@ export default function RecAndPlayStreams() {
   const stopRecording = async () => {
     try {
       stopAnimation();
-      console.log('Stopping myRecording..');
-      setMyRecording(undefined);
-      setIsRecording(false);
-      setDurationMillis(0);
-      if (!myRecording) throw new Error('No myRecording to stop');
+      console.log('Stopping recording..');
+
+      if (!myRecording) throw new Error('No recording to stop');
       await myRecording.stopAndUnloadAsync();
-      await Audio.setAudioModeAsync(
-        {
-          allowsRecordingIOS: false,
-        }
-      );
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
       const uri = myRecording.getURI();
-      if (!uri) throw new Error('Failed to get myRecording URI');
+      if (!uri) throw new Error('Failed to get recording URI');
       setAudioUri(uri);
       await sendToServer(uri);
     } catch (e) {
-      console.error('Failed to stop myRecording', e);
+      console.error('Failed to stop recording', e);
+    } finally {
+      // Assicurati di impostare myRecording su undefined
+      myRecording = undefined;
+      setIsRecording(false);
+      setDurationMillis(0);
     }
-  }
+  };
 
   const onPlayingStatusUpdate = (status: AVPlaybackStatus & { isPlaying?: boolean }) => {
     const { isPlaying: _isPlaying = false } = status;
@@ -225,8 +235,6 @@ export default function RecAndPlayStreams() {
     soundRef.current = null;
     setIsPlaying(false);
   };
-
-  const isRecButtonDisabled = useMemo(() => isRecording || isPlaying || isServerLoading, [isRecording, isPlaying, isServerLoading])
 
   return (
     <View className="flex items-center justify-center flex-1">

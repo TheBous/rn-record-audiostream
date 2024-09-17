@@ -39,13 +39,13 @@ const BottomConversations = ({ sendNewMsg }: IBottomConversationsProps) => {
                     </Pressable>
                 </View>
                 <ScrollView className='flex-1 flex gap-y-4 p-2'>
-                    {messages.map(({ content = "", role }) => {
+                    {messages.map(({ content = "", role }, index) => {
                         const positioningClass = role === MessageRole.AI ? 'self-end' : 'self-start';
                         const imagePositioning = role === MessageRole.AI ? 'flex-row-reverse' : 'flex-row'
                         const msgColour = role === MessageRole.AI ? "bg-blue-400" : 'bg-gray-400';
 
                         return (
-                            <View className={`flex ${imagePositioning} gap-x-2 items-center ${positioningClass} max-w-[85%]`} key={content}>
+                            <View className={`flex ${imagePositioning} gap-x-2 items-center ${positioningClass} max-w-[85%]`} key={`${content}-${index}`}>
                                 <Image
                                     className='rounded-full w-10 h-10'
                                     source={{
