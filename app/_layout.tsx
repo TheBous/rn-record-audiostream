@@ -3,6 +3,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { polyfill as polyfillFetch } from 'react-native-polyfill-globals/src/fetch';
 import 'react-native-reanimated';
 
@@ -31,10 +32,12 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+      <GestureHandlerRootView className="flex-1">
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </GestureHandlerRootView>
     </ThemeProvider>
   );
 }

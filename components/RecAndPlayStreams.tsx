@@ -1,7 +1,10 @@
+import useMessagesStore, { MessageRole } from '@/store/messages';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { RecordingStatus } from 'expo-av/build/Audio';
 import { useMemo, useRef, useState } from 'react';
 import { Animated, View } from 'react-native';
+import { fetch as fetchRNApi } from "react-native-fetch-api";
+import BottomConversations from './Conversations/BottomConversations';
 import RecButton from './RecButton/RecButton';
 import SoundBars from './RecButton/SoundBars';
 
@@ -15,6 +18,7 @@ export default function RecAndPlayStreams() {
   const [durationMillis, setDurationMillis] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isServerLoading, setServerLoading] = useState(false);
+  const { messages, setMessages, appendContentToLastMessage, appendmessage } = useMessagesStore();
 
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
@@ -109,7 +113,7 @@ export default function RecAndPlayStreams() {
 
       formData.append('audio', audioFile);
       formData.append('botId', botId);
-      formData.append('chat', JSON.stringify([]));
+      formData.append('chat', JSON.stringify(messages));
 
       const url = `${domain}/api/omni/${botId}`;
       const response = await fetch(url, {
@@ -133,51 +137,37 @@ export default function RecAndPlayStreams() {
 
           // TODO add question to chat and consume text streaming
 
+          if (question) {
+            appendmessage({ content: question, role: MessageRole.USER })
+          }
+
           if (audioStreamName) {
             const streamingAudioUrl = `${domain}/api/omni/consume_audio?streamName=${audioStreamName}`;
             await playSound(streamingAudioUrl);
-            // audio.src = streamingAudioUrl;
-            // audio.crossOrigin = 'anonymous';
-            // audio.play()
-
-            // audio.onloadedmetadata = () => {
-            //   ChatMetadataStore.update((store) => ({ ...store, aiIsTalking: true }));
-            // }
-
-            // audio.onended = () => {
-
-            //   ChatMetadataStore.update((store) => ({ ...store, aiIsTalking: false }));
-            // }
-
-            // audio.onerror = () => {
-            //   ChatMetadataStore.update((store) => ({ ...store, aiIsTalking: false }));
-            // }
           }
 
-          // if (textStreamName) {
-          //   const response = await fetch(
-          //     `${PUBLIC_BOT_ENDPOINT}/api/omni/consume_text?streamName=${textStreamName}`,
-          //     { method: 'GET' }
-          //   );
+          if (textStreamName) {
+            const response = await fetchRNApi(
+              `${domain}/api/omni/consume_text?streamName=${textStreamName}`,
+              { method: 'GET', reactNative: { textStreaming: true } }
+            );
 
-          //   if (response.ok) {
-          //     const reader = response.body!.getReader();
-          //     let isNewMessage = true;
-          //     while (true) {
-          //       const { done, value } = await reader.read();
-          //       if (done) break;
+            const body = await response.body;
+            const reader = body!.getReader();
+            let isNewMessage = true;
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
 
-          //       const decodedValue = new TextDecoder().decode(value, { stream: true });
-          //       if (updateChatClientHistory) {
-          //         updateChatClientHistory(decodedValue, {
-          //           forceNewMessage: isNewMessage,
-          //           role: 'answer'
-          //         })
-          //       }
-          //       isNewMessage = false;
-          //     }
-          //   }
-          // }
+              const decodedValue = new TextDecoder().decode(value, { stream: true });
+              if (decodedValue) {
+                if (isNewMessage) appendmessage({ content: decodedValue, role: MessageRole.AI });
+                else appendContentToLastMessage(` ${decodedValue}`);
+
+                isNewMessage = false;
+              }
+            }
+          }
         }
       }
     } catch (e) {
@@ -239,7 +229,7 @@ export default function RecAndPlayStreams() {
   const isRecButtonDisabled = useMemo(() => isRecording || isPlaying || isServerLoading, [isRecording, isPlaying, isServerLoading])
 
   return (
-    <View className="flex items-center justify-center">
+    <View className="flex items-center justify-center flex-1">
       <Animated.View
         style={{
           transform: [{ scale: scaleAnim }],
@@ -255,7 +245,7 @@ export default function RecAndPlayStreams() {
           />
         }
       </Animated.View>
+      <BottomConversations sendNewMsg={console.warn} />
     </View>
-    // {!!audioUri && !isPlaying && <Button title="Play Sound" onPress={() => playSound('https://beta-ai-rag-system-backend.original.land/api/omni/consume_audio?streamName=37ab16b9-93fd-4e81-a833-b7929c21bf28')} />}
   );
 }
