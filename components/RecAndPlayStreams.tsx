@@ -346,33 +346,34 @@ export default function RecAndPlayStreams() {
 
   return (
     <>
-    <Text className='ml-auto mr-auto mt-10 text-4xl font-bold text-center'>Talk to Noku AI</Text>
-    <Text className='ml-auto mr-auto mt-5 font-light text-xl text-center'>Press and hold red button to talk</Text>
+      <Text className='ml-auto mr-auto mt-10 text-4xl font-bold text-center'>Talk to Noku AI</Text>
+      <Text className='ml-auto mr-auto mt-5 font-light text-xl text-center'>Press and hold red button to talk</Text>
       <View className="flex items-center justify-center flex-1">
-        <Animated.View
-          style={{
-            transform: [{ scale: scaleAnim }],
-          }}
-        >
-          {isPlaying ?
-            <Voice onVoiceClick={onStopPlaying} /> :
-            <View className='flex flex-col gap-y-5 items-center justify-between'>
-              <Image
-                source={{
-                  uri: 'https://static.noku.io/assets/noku/ai/bot-avatar/66d1764c1357bc6c2f64b256.png',
-                }}
-                className="w-56 h-56 rounded-full object-cover mr-2 mb-14"
-                alt="Agent avatar"
-              />
+        <View className='flex flex-col items-center justify-between'>
+          <Image
+            source={{
+              uri: 'https://static.noku.io/assets/noku/ai/bot-avatar/66d1764c1357bc6c2f64b256.png',
+            }}
+            className="w-56 h-56 rounded-full object-cover mr-2 mb-14"
+            alt="Agent avatar"
+          />
+          <Animated.View
+            style={{
+              transform: [{ scale: scaleAnim }],
+            }}
+          >
+
+            {isPlaying ?
+              <Voice onVoiceClick={onStopPlaying} /> :
               <RecButton
                 isLoading={isServerLoading}
                 disabled={isRecButtonDisabled}
                 startRecording={startRecording}
                 stopRecording={stopRecording}
               />
-            </View>
-          }
-        </Animated.View>
+            }
+          </Animated.View>
+        </View>
         <BottomConversations sendNewMsg={sendNewMsg} isSendNewMsgDisabled={isRecButtonDisabled} />
       </View>
     </>

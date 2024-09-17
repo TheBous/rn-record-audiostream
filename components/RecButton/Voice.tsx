@@ -1,6 +1,6 @@
 // Voice.tsx
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Animated, TouchableOpacity, View } from 'react-native';
 
 interface VoiceProps {
     onVoiceClick?: () => void;
@@ -40,7 +40,7 @@ const Voice = ({ onVoiceClick }: VoiceProps) => {
 
     return (
         <TouchableOpacity onPress={onVoiceClick}>
-            <View style={styles.bars}>
+            <View style={styles.bars} className="h-28">
                 {bars.map((bar, index) => (
                     <Animated.View
                         key={index}
