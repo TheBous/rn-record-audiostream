@@ -144,11 +144,8 @@ export default function RecAndPlayStreams() {
           const { data: responseData } = await response.json();
           const { textStreamName, question, audioStreamName } = responseData;
 
-          // TODO add question to chat and consume text streaming
-
-          if (question) {
-            appendmessage({ content: question, role: MessageRole.USER })
-          }
+          appendmessage({ content: question ?? "Error while decoding questions from user", role: MessageRole.USER });
+          appendmessage({ role: MessageRole.AI, content: "" });
 
           if (audioStreamName) {
             const streamingAudioUrl = `${domain}/api/omni/consume_audio?streamName=${audioStreamName}`;
@@ -163,18 +160,12 @@ export default function RecAndPlayStreams() {
 
             const body = await response.body;
             const reader = body!.getReader();
-            let isNewMessage = true;
             while (true) {
               const { done, value } = await reader.read();
               if (done) break;
 
               const decodedValue = new TextDecoder().decode(value, { stream: true });
-              if (decodedValue) {
-                if (isNewMessage) appendmessage({ content: decodedValue, role: MessageRole.AI });
-                else appendContentToLastMessage(` ${decodedValue}`);
-
-                isNewMessage = false;
-              }
+              if (decodedValue) appendContentToLastMessage(` ${decodedValue}`);
             }
           }
         }
@@ -269,6 +260,7 @@ export default function RecAndPlayStreams() {
   const sendNewMsg = async (question: string) => {
     const formattedText = question.charAt(0).toUpperCase() + question.slice(1).toLowerCase();
     appendmessage({ content: formattedText, role: MessageRole.USER });
+    appendmessage({ role: MessageRole.AI, content: "" })
 
     const body: {
       query: string;
@@ -307,10 +299,8 @@ export default function RecAndPlayStreams() {
 
     const bodyResponse = await response.body;
     const reader = bodyResponse!.getReader();
-    let isNewMessage = true;
     while (true) {
       const { done, value } = await reader.read();
-
       if (done) break;
 
       const decodedValue = new TextDecoder().decode(value, { stream: true });
@@ -321,20 +311,9 @@ export default function RecAndPlayStreams() {
         if (contentChunk) {
           const parsedChunk = JSON.parse(contentChunk);
           const content = parsedChunk.content;
-          if (content) {
-            if (isNewMessage) appendmessage({ content, role: MessageRole.AI });
-            else appendContentToLastMessage(content);
-
-            isNewMessage = false;
-          }
+          if (content) appendContentToLastMessage(content);
         }
       });
-      // if (decodedValue) {
-      //   if (isNewMessage) appendmessage({ content: decodedValue, role: MessageRole.AI });
-      //   else appendContentToLastMessage(` ${decodedValue}`);
-
-      //   isNewMessage = false;
-      // }
     }
 
   };

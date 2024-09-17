@@ -4,6 +4,7 @@ import { Send } from "lucide-react-native";
 import { useCallback, useRef } from 'react';
 import { Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import useMarkdown, { textToMarkdown } from 'react-native-usemarkdown-chat';
+import BouncingLoader from '../RecButton/BouncingLoader';
 
 interface IBottomConversationsProps {
     sendNewMsg: (msg: string) => void;
@@ -44,9 +45,11 @@ const BottomConversations = ({ sendNewMsg }: IBottomConversationsProps) => {
                 >
                     <ScrollView className='flex-1 flex gap-y-4 p-2'>
                         {messages.map(({ content = "", role }, index) => {
-                            const positioningClass = role === MessageRole.AI ? 'self-end' : 'self-start';
-                            const imagePositioning = role === MessageRole.AI ? 'flex-row-reverse' : 'flex-row'
-                            const msgColour = role === MessageRole.AI ? "bg-blue-400" : 'bg-gray-400';
+                            const isAIMessage = role === MessageRole.AI;
+                            const isLoadingMsg = !content;
+                            const positioningClass = isAIMessage ? 'self-end' : 'self-start';
+                            const imagePositioning = isAIMessage ? 'flex-row-reverse' : 'flex-row'
+                            const msgColour = isAIMessage ? "bg-blue-400" : 'bg-gray-400';
 
                             return (
                                 <View className={`flex ${imagePositioning} gap-x-2 items-start ${positioningClass} max-w-[85%]`} key={`${content}-${index}`}>
@@ -57,7 +60,8 @@ const BottomConversations = ({ sendNewMsg }: IBottomConversationsProps) => {
                                         }}
                                     />
                                     <View className={`border-gray-200 rounded-lg p-4 space-y-3 flex items-center gap-x-1 flex-wrap ${msgColour}`}>
-                                        <Text>{textToMarkdown(content)}</Text>
+                                        {isLoadingMsg ? <BouncingLoader /> : <Text>{textToMarkdown(content)}</Text>}
+
                                     </View>
                                 </View>
                             )
