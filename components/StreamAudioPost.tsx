@@ -40,7 +40,7 @@ const StreamAudio = () => {
         try {
             const apiKey = 'usr_rK1WGJWkuf9lzc33OW1pwf2WvqXBHQfL';
 
-            const url = `http://192.168.1.5:8120/api/omni/669e08bd6614ff72acff93be`;
+            const url = `http://192.168.1.5:8120/api/omni/6666ae3ef38d11470be2949f`;
             let buffer = '';
             const textDecoder = new TextDecoder();
 

@@ -12,7 +12,7 @@ const RecButton = ({
 }) => {
     return (
         <Pressable
-            className={`rounded-full flex items-center justify-center bg-red-600 w-56 h-56`}
+            className={`rounded-full flex items-center justify-center bg-red-600 w-56 h-56 active:bg-red-700`}
             onTouchStart={startRecording}
             onTouchEnd={stopRecording}
             disabled={disabled}

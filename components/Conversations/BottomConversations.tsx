@@ -8,9 +8,10 @@ import BouncingLoader from '../RecButton/BouncingLoader';
 
 interface IBottomConversationsProps {
     sendNewMsg: (msg: string) => void;
+    isSendNewMsgDisabled?: boolean;
 }
 
-const BottomConversations = ({ sendNewMsg }: IBottomConversationsProps) => {
+const BottomConversations = ({ sendNewMsg, isSendNewMsgDisabled = false }: IBottomConversationsProps) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
 
     const handleSheetChanges = useCallback((index: number) => {
@@ -54,7 +55,7 @@ const BottomConversations = ({ sendNewMsg }: IBottomConversationsProps) => {
                             return (
                                 <View className={`flex ${imagePositioning} gap-x-2 items-start ${positioningClass} max-w-[85%]`} key={`${content}-${index}`}>
                                     <Image
-                                        className='rounded-full w-10 h-10'
+                                        className='rounded-full w-10 h-10 max-w-10 max-h-10 shrink-0'
                                         source={{
                                             uri: 'https://reactnative.dev/img/tiny_logo.png',
                                         }}
@@ -75,8 +76,8 @@ const BottomConversations = ({ sendNewMsg }: IBottomConversationsProps) => {
                             placeholder='Ask a question here...'
                             placeholderTextColor="black"
                         />
-                        <Pressable onPress={onSend} className='bg-blue-500 rounded-full p-2'>
-                            <Send size={24} className='text-white' />
+                        <Pressable onPress={onSend} className='bg-blue-500 rounded-full p-2 active:bg-blue-600' disabled={isSendNewMsgDisabled}>
+                            <Send size={22} className='text-white' />
                         </Pressable>
                     </View>
                 </KeyboardAvoidingView>

@@ -11,7 +11,7 @@ import Voice from './RecButton/Voice';
 const domain = 'https://beta-ai-rag-system-backend.original.land';
 
 const userApiKey = 'usr_rK1WGJWkuf9lzc33OW1pwf2WvqXBHQfL';
-const botId = '669e08bd6614ff72acff93be';
+const botId = '6666ae3ef38d11470be2949f';
 let myRecording: Audio.Recording | undefined;
 
 export default function RecAndPlayStreams() {
@@ -335,7 +335,7 @@ export default function RecAndPlayStreams() {
           />
         }
       </Animated.View>
-      <BottomConversations sendNewMsg={sendNewMsg} />
+      <BottomConversations sendNewMsg={sendNewMsg} isSendNewMsgDisabled={isRecButtonDisabled} />
     </View>
   );
 }
