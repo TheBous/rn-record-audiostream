@@ -35,12 +35,14 @@ const writeAudioDataToFile = async (newAudioUrl: string, base64AudioData: string
     });
 }
 
+const botId = "66e9ae8dbf41992862cb0a29"; // strong beta: 66e9ae8dbf41992862cb0a29, noku ai beta: '6666ae3ef38d11470be2949f' - strong prod: 66b6266e76a3c6f8b549945a
+
 const StreamAudio = () => {
     const playAudioFromNodeJS = async () => {
         try {
             const apiKey = 'usr_rK1WGJWkuf9lzc33OW1pwf2WvqXBHQfL';
 
-            const url = `http://192.168.1.5:8120/api/omni/6666ae3ef38d11470be2949f`;
+            const url = `http://192.168.1.5:8120/api/omni/${botId}`;
             let buffer = '';
             const textDecoder = new TextDecoder();
 
