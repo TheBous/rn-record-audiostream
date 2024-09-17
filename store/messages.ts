@@ -32,7 +32,7 @@ const useMessagesStore = create<MessagesState>((set) => ({
     appendContentToLastMessage: (content) => set((state) => {
         const lastMessage = state.messages[state.messages.length - 1];
         if (!lastMessage) return state;
-        lastMessage.content = `${lastMessage.content || ''}${content}`;
+        lastMessage.content += content;
         return { messages: [...state.messages] };
     })
 }));

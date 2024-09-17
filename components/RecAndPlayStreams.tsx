@@ -321,7 +321,6 @@ export default function RecAndPlayStreams() {
         if (contentChunk) {
           const parsedChunk = JSON.parse(contentChunk);
           const content = parsedChunk.content;
-          console.warn(2, content);
           if (content) {
             if (isNewMessage) appendmessage({ content, role: MessageRole.AI });
             else appendContentToLastMessage(content);
