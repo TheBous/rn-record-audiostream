@@ -362,7 +362,6 @@ export default function RecAndPlayStreams() {
               transform: [{ scale: scaleAnim }],
             }}
           >
-
             {isPlaying ?
               <Voice onVoiceClick={onStopPlaying} /> :
               <RecButton

@@ -26,6 +26,8 @@ const BottomConversations = ({ sendNewMsg, isSendNewMsgDisabled = false }: IBott
     const { messages } = useMessagesStore();
     const [text, setText] = useMarkdown();
 
+    const scrollViewRef = useRef<ScrollView>(null);
+
     const onSend = () => {
         sendNewMsg(text);
         setText('');
@@ -45,39 +47,55 @@ const BottomConversations = ({ sendNewMsg, isSendNewMsgDisabled = false }: IBott
                     behavior={Platform.OS === "ios" ? "padding" : undefined}
                     keyboardVerticalOffset={Platform.OS === "ios" ? 200 : 0}
                 >
-                    <ScrollView className='flex-1 flex gap-y-4 p-2'>
+                    <ScrollView
+                        ref={scrollViewRef}
+                        className='flex-1 flex gap-y-4 p-2'
+                        onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+                    >
                         {messages.map(({ content = "", role }, index) => {
                             const isAIMessage = role === MessageRole.AI;
                             const isLoadingMsg = !content;
                             const positioningClass = isAIMessage ? 'self-end' : 'self-start';
-                            const imagePositioning = isAIMessage ? 'flex-row-reverse' : 'flex-row'
+                            const imagePositioning = isAIMessage ? 'flex-row-reverse' : 'flex-row';
                             const msgColour = isAIMessage ? "bg-blue-400" : 'bg-gray-400';
 
                             return (
-                                <View className={`flex ${imagePositioning} gap-x-2 items-start ${positioningClass} max-w-[85%]`} key={`${content}-${index}`}>
+                                <View
+                                    className={`flex ${imagePositioning} gap-x-2 items-start ${positioningClass} max-w-[85%]`}
+                                    key={`${content}-${index}`}
+                                >
                                     <Image
                                         className='rounded-full w-10 h-10 max-w-10 max-h-10 shrink-0'
                                         source={{
                                             uri: 'https://reactnative.dev/img/tiny_logo.png',
                                         }}
                                     />
-                                    <View className={`border-gray-200 rounded-lg p-4 space-y-3 flex items-center gap-x-1 flex-wrap ${msgColour}`}>
+                                    <View
+                                        className={`border-gray-200 rounded-lg p-4 space-y-3 flex items-center gap-x-1 flex-wrap ${msgColour}`}
+                                    >
                                         {isLoadingMsg ? <BouncingLoader /> : <Markdown>{content}</Markdown>}
-
                                     </View>
                                 </View>
-                            )
+                            );
                         })}
+                        <View className='h-2' />
                     </ScrollView>
-                    <View className='w-full flex gap-x-2 items-center justify-between flex-row' style={{ marginBottom: 20 }}>
+                    <View
+                        className='w-full flex gap-x-2 items-center justify-between flex-row'
+                        style={{ marginBottom: 20 }}
+                    >
                         <TextInput
                             className='flex-1 h-12 border border-blue-500 rounded-md text-black px-2'
                             value={text}
                             onChangeText={setText}
                             placeholder='Ask a question here...'
-                            placeholderTextColor="black"
+                            placeholderTextColor='black'
                         />
-                        <Pressable onPress={onSend} className='bg-blue-500 rounded-full p-2 active:bg-blue-600' disabled={isSendNewMsgDisabled}>
+                        <Pressable
+                            onPress={onSend}
+                            className='bg-blue-500 rounded-full p-2 active:bg-blue-600'
+                            disabled={isSendNewMsgDisabled}
+                        >
                             <Send size={22} className='text-white' />
                         </Pressable>
                     </View>
