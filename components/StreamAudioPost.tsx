@@ -11,16 +11,6 @@ export interface StreamingResponse {
     role: Role;
 }
 
-const processChunk = async (parsedChunk: StreamingResponse) => {
-    if (parsedChunk.type === 'audio') {
-        const audioBuffer = Uint8Array.from(atob(parsedChunk.content), (c) =>
-            c.charCodeAt(0)
-        ).buffer;
-
-        console.warn(audioBuffer);
-    }
-};
-
 export async function saveAudioToLocalCache(
     audioUrl: string,
     soundName: string

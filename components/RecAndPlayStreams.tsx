@@ -6,7 +6,6 @@ import { Animated, View } from 'react-native';
 import { fetch as fetchRNApi } from "react-native-fetch-api";
 import BottomConversations from './Conversations/BottomConversations';
 import RecButton from './RecButton/RecButton';
-import SoundBars from './RecButton/Voice';
 import Voice from './RecButton/Voice';
 
 const domain = 'https://beta-ai-rag-system-backend.original.land';
@@ -156,9 +155,7 @@ export default function RecAndPlayStreams() {
 
           if (audioStreamName) {
             const streamingAudioUrl = `${domain}/api/omni/consume_audio?streamName=${audioStreamName}`;
-            console.warn(1);
             await playSound(streamingAudioUrl);
-            console.warn(2);
           }
 
           if (textStreamName) {
