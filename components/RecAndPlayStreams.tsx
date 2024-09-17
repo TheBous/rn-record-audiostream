@@ -6,7 +6,8 @@ import { Animated, View } from 'react-native';
 import { fetch as fetchRNApi } from "react-native-fetch-api";
 import BottomConversations from './Conversations/BottomConversations';
 import RecButton from './RecButton/RecButton';
-import SoundBars from './RecButton/SoundBars';
+import SoundBars from './RecButton/Voice';
+import Voice from './RecButton/Voice';
 
 const domain = 'https://beta-ai-rag-system-backend.original.land';
 
@@ -15,11 +16,12 @@ let myRecording: Audio.Recording | undefined;
 export default function RecAndPlayStreams() {
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [audioUri, setAudioUri] = useState<string>();
-  const [isPlaying, setIsPlaying] = useState(false);
   const [durationMillis, setDurationMillis] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isServerLoading, setServerLoading] = useState(false);
   const { messages, appendContentToLastMessage, appendmessage } = useMessagesStore();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const isPlayingRef = useRef(false);
 
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
@@ -154,7 +156,9 @@ export default function RecAndPlayStreams() {
 
           if (audioStreamName) {
             const streamingAudioUrl = `${domain}/api/omni/consume_audio?streamName=${audioStreamName}`;
+            console.warn(1);
             await playSound(streamingAudioUrl);
+            console.warn(2);
           }
 
           if (textStreamName) {
@@ -210,16 +214,47 @@ export default function RecAndPlayStreams() {
     }
   };
 
-  const onPlayingStatusUpdate = (status: AVPlaybackStatus & { isPlaying?: boolean }) => {
-    const { isPlaying: _isPlaying = false } = status;
-    setIsPlaying(_isPlaying);
+  const onPlayingStatusUpdate = (status: AVPlaybackStatus) => {
+    if (!status.isLoaded) {
+      if (status.error) {
+        console.error(`Playback Error: ${status.error}`);
+      }
+      return;
+    }
+
+    const wasPlaying = isPlayingRef.current;
+    isPlayingRef.current = status.isPlaying;
+
+    if (status.isPlaying && !wasPlaying) {
+      // La riproduzione è appena iniziata
+      console.log('Playback started');
+      setIsPlaying(true);
+    } else if (!status.isPlaying && wasPlaying) {
+      if (status.didJustFinish) {
+        // La riproduzione è appena terminata naturalmente
+        console.log('Playback finished');
+        setIsPlaying(false);
+
+        // Pulisci il suono
+        soundRef.current?.unloadAsync();
+        soundRef.current = null;
+      } else {
+        // La riproduzione è stata interrotta manualmente
+        console.log('Playback stopped manually');
+        setIsPlaying(false);
+      }
+    }
   };
 
   const playSound = async (overrideUri?: string) => {
     try {
       const uri = overrideUri || audioUri;
       if (!uri) throw new Error('No audio URI to play');
-      const { sound } = await Audio.Sound.createAsync({ uri }, { shouldPlay: false }, onPlayingStatusUpdate);
+      const { sound } = await Audio.Sound.createAsync(
+        { uri },
+        { shouldPlay: false },
+        onPlayingStatusUpdate
+      );
 
       soundRef.current = sound;
       await soundRef.current.playAsync();
@@ -244,7 +279,7 @@ export default function RecAndPlayStreams() {
         }}
       >
         {isPlaying ?
-          <SoundBars onVoiceClick={onStopPlaying} /> :
+          <Voice onVoiceClick={onStopPlaying} /> :
           <RecButton
             isLoading={isServerLoading}
             disabled={isRecButtonDisabled}
