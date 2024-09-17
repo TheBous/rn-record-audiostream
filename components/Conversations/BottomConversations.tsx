@@ -1,12 +1,11 @@
 import useMessagesStore, { MessageRole } from '@/store/messages';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import { Send } from "lucide-react-native";
+import { Send, User2Icon } from "lucide-react-native";
 import { useCallback, useRef } from 'react';
 import { Image, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import useMarkdown from 'react-native-usemarkdown-chat';
 import BouncingLoader from '../RecButton/BouncingLoader';
-
 interface IBottomConversationsProps {
     sendNewMsg: (msg: string) => void;
     isSendNewMsgDisabled?: boolean;
@@ -64,12 +63,14 @@ const BottomConversations = ({ sendNewMsg, isSendNewMsgDisabled = false }: IBott
                                     className={`flex ${imagePositioning} gap-x-2 items-start ${positioningClass} max-w-[85%]`}
                                     key={`${content}-${index}`}
                                 >
-                                    <Image
+                                    {isAIMessage ? <Image
                                         className='rounded-full w-10 h-10 max-w-10 max-h-10 shrink-0'
                                         source={{
-                                            uri: 'https://reactnative.dev/img/tiny_logo.png',
+                                            uri: 'https://static.noku.io/assets/noku/ai/bot-avatar/66d1764c1357bc6c2f64b256.png',
                                         }}
-                                    />
+                                    /> :
+                                        <View className='rounded-full w-10 h-10 max-w-10 max-h-10 shrink-0 bg-slate-300 flex items-center justify-center'><User2Icon className='w-full h-full' /></View>}
+
                                     <View
                                         className={`border-gray-200 rounded-lg p-4 space-y-3 flex items-center gap-x-1 flex-wrap ${msgColour}`}
                                     >
