@@ -1,51 +1,135 @@
-# Welcome to your Expo app 👋
+# SuperHumans
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Description
 
-## Get started
+SuperHumans is a mobile application built using Expo. Follow the instructions below to set up the development environment and run the app.
 
-1. Install dependencies
+## Prerequisites
 
-   ```bash
-   npm install
-   ```
+Make sure you have Node.js installed on your machine. You can download it from [here](https://nodejs.org/).
 
-2. Start the app
+### Install Expo and EAS CLI
 
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Before getting started, install Expo CLI and EAS CLI globally on your machine. Run the following commands:
 
 ```bash
-npm run reset-project
+npm install -g expo-cli eas-cli
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Login to Expo
 
-## Learn more
+Once installed, log in to Expo using the EAS CLI:
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+eas login
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Follow the instructions on the command line to complete the login process.
 
-## Join the community
+### Installing Ruby and Bundler
 
-Join our community of developers creating universal apps.
+1. **Install rbenv** (if you don’t already have it):
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-# A simple React Native Application to record audio and play them. Streaming audio is also available
+   ```bash
+   brew install rbenv
+   ```
+
+2. **Configure rbenv**:
+
+   Open the appropriate configuration file with an editor, such as:
+
+   ```bash
+   nano ~/.zshrc
+   ```
+
+   Add the following line at the end of the file:
+
+   ```bash
+   eval "$(rbenv init -)"
+   ```
+
+   Save and close the file, then run:
+
+   ```bash
+   source ~/.zshrc
+   ```
+
+3. **Install Ruby 3.2**:
+
+   ```bash
+   rbenv install 3.2.0
+   rbenv global 3.2.0
+   ```
+
+4. **Verify the Ruby version**:
+
+   ```bash
+   ruby -v
+   ```
+
+   You should see something like:
+
+   ```bash
+   ruby 3.2.0
+   ```
+
+5. **Install Bundler**:
+
+   If you don’t have Bundler installed, use the following command to manage project dependencies:
+
+   ```bash
+   gem install bundler
+   ```
+
+6. **Install the project's gems**:
+
+   Once Ruby 3.2 is configured and Bundler is installed, run this command to install the required gems (including Fastlane):
+
+   ```bash
+   bundle install
+   ```
+
+   This command will analyze the Gemfile and install the required gems, including Fastlane, in the specified versions.
+
+### Using Fastlane with Bundler
+
+Now that Fastlane is installed through Bundler, you can run Fastlane using the `bundle exec` prefix to ensure you're using the correct version installed in your project:
+
+```bash
+bundle exec fastlane --version
+```
+
+### Downloading iOS Components via Xcode
+
+Before building for iOS, make sure you have downloaded the necessary iOS components via Xcode:
+
+1. Open Xcode.
+2. Go to **Xcode > Preferences > Components**.
+3. In the **Components** section, you will see a list of available simulators and SDKs. 
+4. If the iOS 18.0 SDK is available, download it from here.
+
+### Running the SuperHumans App
+
+To launch the SuperHumans app, use the following command:
+
+```bash
+npx expo -c
+```
+
+### Building a Local Android APK
+
+To build the SuperHumans app for Android locally and generate an APK, use the following command:
+
+```bash
+npm run build:local:android
+```
+
+### Building a Local iOS App
+
+To build the SuperHumans app for iOS locally, use the following command:
+
+```bash
+npm run build:local:ios
+```
+
+Make sure you have all the necessary tools installed for iOS development, such as Xcode.
