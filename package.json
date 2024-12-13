@@ -5,6 +5,7 @@
   "scripts": {
     "start": "expo start",
     "start:tunnel": "expo start --tunnel",
+    "start:minify": "expo start --no-dev --minify",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
@@ -54,7 +55,8 @@
     "react-native-usemarkdown-chat": "^0.2.1",
     "react-native-web": "~0.19.13",
     "web-streams-polyfill": "^4.0.0",
-    "zustand": "^5.0.0-rc.2"
+    "zustand": "^5.0.0-rc.2",
+    "expo-dev-client": "~5.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
