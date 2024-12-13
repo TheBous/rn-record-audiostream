@@ -54,7 +54,8 @@
     "react-native-usemarkdown-chat": "^0.2.1",
     "react-native-web": "~0.19.10",
     "web-streams-polyfill": "^4.0.0",
-    "zustand": "^5.0.0-rc.2"
+    "zustand": "^5.0.0-rc.2",
+    "expo-haptics": "~13.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -7,6 +7,7 @@ import { fetch as fetchRNApi } from "react-native-fetch-api";
 import BottomConversations from './Conversations/BottomConversations';
 import RecButton from './RecButton/RecButton';
 import Voice from './RecButton/Voice';
+import * as Haptics from 'expo-haptics';
 
 const domain = 'http://localhost:8120'; //'https://beta-ai-rag-system-backend.original.land';
 
@@ -70,6 +71,7 @@ export default function RecAndPlayStreams() {
 
   const startRecording = async () => {
     try {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); // Inizia la vibrazione
       if (isRecButtonDisabled) return;
       if (!permissionResponse || permissionResponse.status !== 'granted') {
         console.log('Requesting permission..');
@@ -189,6 +191,7 @@ export default function RecAndPlayStreams() {
 
   const stopRecording = async () => {
     try {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning); // Ferma la vibrazione
       stopAnimation();
       console.log('Stopping recording..');
 
