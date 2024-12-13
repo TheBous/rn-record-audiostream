@@ -8,7 +8,7 @@ import BottomConversations from './Conversations/BottomConversations';
 import RecButton from './RecButton/RecButton';
 import Voice from './RecButton/Voice';
 
-const domain = 'https://beta-ai-rag-system-backend.original.land';
+const domain = 'http://localhost:8120'; //'https://beta-ai-rag-system-backend.original.land';
 
 const userApiKey = 'usr_rK1WGJWkuf9lzc33OW1pwf2WvqXBHQfL';
 const botId = "66e9ae8dbf41992862cb0a29"; // strong beta: 66e9ae8dbf41992862cb0a29, noku ai beta: '6666ae3ef38d11470be2949f' - strong prod: 66b6266e76a3c6f8b549945a
@@ -20,7 +20,7 @@ export default function RecAndPlayStreams() {
   const [durationMillis, setDurationMillis] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isServerLoading, setServerLoading] = useState(false);
-  const { messages, appendContentToLastMessage, appendmessage } = useMessagesStore();
+  const { messages, appendContentToLastMessage, replaceContentToLastMessage, appendmessage } = useMessagesStore();
   const [isPlaying, setIsPlaying] = useState(false);
   const isPlayingRef = useRef(false);
 
@@ -150,13 +150,13 @@ export default function RecAndPlayStreams() {
           appendmessage({ role: MessageRole.AI, content: "" });
 
           if (audioStreamName) {
-            const streamingAudioUrl = `${domain}/api/omni/consume_audio?streamName=${audioStreamName}`;
+            const streamingAudioUrl = `${domain}/api/consume/audio?streamName=${audioStreamName}`;
             await playSound(streamingAudioUrl);
           }
 
           if (textStreamName) {
             const response = await fetchRNApi(
-              `${domain}/api/omni/consume_text?streamName=${textStreamName}`,
+              `${domain}/api/consume/text?streamName=${textStreamName}`,
               {
                 method: 'GET',
                 reactNative: { textStreaming: true },
@@ -327,9 +327,9 @@ export default function RecAndPlayStreams() {
 
         messagesChunks.forEach((contentChunk) => {
           if (contentChunk) {
-            const parsedChunk = JSON.parse(contentChunk);
-            const content = parsedChunk.content;
-            if (content) appendContentToLastMessage(content);
+          const parsedChunk = JSON.parse(contentChunk);
+          const content = parsedChunk?.content?.content;
+          if (content) replaceContentToLastMessage(content);
           }
         });
       }

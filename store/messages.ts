@@ -22,6 +22,7 @@ interface MessagesState {
     appendmessage: (message: ChatMessage) => void;
     prependMessage: (message: ChatMessage) => void;
     appendContentToLastMessage: (content: string) => void;
+    replaceContentToLastMessage: (content: string) => void;
 }
 
 const useMessagesStore = create<MessagesState>((set) => ({
@@ -33,6 +34,12 @@ const useMessagesStore = create<MessagesState>((set) => ({
         const lastMessage = state.messages[state.messages.length - 1];
         if (!lastMessage) return state;
         lastMessage.content += content;
+        return { messages: [...state.messages] };
+    }),
+    replaceContentToLastMessage: (content) => set((state) => {
+        const lastMessage = state.messages[state.messages.length - 1];
+        if (!lastMessage) return state;
+        lastMessage.content = content;
         return { messages: [...state.messages] };
     })
 }));
