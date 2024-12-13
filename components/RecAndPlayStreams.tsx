@@ -9,7 +9,7 @@ import RecButton from './RecButton/RecButton';
 import Voice from './RecButton/Voice';
 import * as Haptics from 'expo-haptics';
 
-const domain = 'http://localhost:8120'; //'https://beta-ai-rag-system-backend.original.land';
+const domain = 'https://beta-ai-rag-system-backend.original.land'; //'http://localhost:8120';
 
 const userApiKey = 'usr_rK1WGJWkuf9lzc33OW1pwf2WvqXBHQfL';
 const botId = "66e9ae8dbf41992862cb0a29"; // strong beta: 66e9ae8dbf41992862cb0a29, noku ai beta: '6666ae3ef38d11470be2949f' - strong prod: 66b6266e76a3c6f8b549945a
