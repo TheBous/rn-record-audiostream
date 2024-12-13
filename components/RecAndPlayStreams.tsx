@@ -1,3 +1,4 @@
+import React from 'react';
 import useMessagesStore, { ChatMessage, MessageRole } from '@/store/messages';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { RecordingStatus } from 'expo-av/build/Audio';
